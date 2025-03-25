@@ -18,11 +18,6 @@ env
 # PyEnv version selector
 .python-version
 
-# Built objects
-*.so
-dist/
-build/
-
 # IDEs
 # PyCharm
 .idea/
