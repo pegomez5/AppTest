@@ -3,6 +3,7 @@ class Event {
   int id;
   String date;
   String location;
+  Event_Coordinator coordinator;
 
   // ------------- Constructor ------------- 
   Event(this.id, this.date, this.location);
