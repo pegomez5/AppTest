@@ -1,3 +1,4 @@
+
 class Event {
   // ------------- Create event variables -------------
   int id;
@@ -33,8 +34,17 @@ class Event {
   // Create event
   // - Should return an event instance 
   Event ev_create_event(String date, String location){
-    return Event(_ev_create_id(date, location), date, location);
+    Event ev = Event(_ev_create_id(date, location), date, location);
+    // Store ev in database
+
+    return ev;
   }
 
   // 
 }
+
+// - Should be a database of events that can be accessed by all sessions
+class Event_Database {
+    // Load events from an actual database
+}
+
