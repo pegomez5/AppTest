@@ -101,6 +101,7 @@ fun UserForm(modifier: Modifier = Modifier) {
         val isFormValid = firstName.isNotBlank() &&
                 lastName.isNotBlank() &&
                 email.contains("@") &&
+                email.isNotBlank() &&
                 (email.contains(".edu") ||
                         email.contains(".org") ||
                         email.contains(".com") ||
@@ -133,7 +134,8 @@ fun UserForm(modifier: Modifier = Modifier) {
             Text("Created user: ${it.firstName} ${it.lastName}" +
                     "\nEmail: ${it.email}" +
                     "\nUsername: ${it.username}" +
-                    "\nUserID: ${it.userID}")
+                    "\nUserID: ${it.userID}" +
+                    "\nIsCoordinator: ${it.isCoordinator}")
 
         }
     }
