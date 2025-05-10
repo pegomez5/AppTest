@@ -1,17 +1,23 @@
-
 class Event {
   // ------------- Create event variables -------------
-  int id;
   String date;
   String location;
   Event_Coordinator coordinator;
+  int? id;
+  string? desc;
 
   // ------------- Constructor ------------- 
-  Event(this.id, this.date, this.location);
+  Event({
+    required this.date,
+    required this.location,
+    required this.coordinator,
+    this.id = null,
+    this.desc = ''
+  });
 
   // ------------- Methods -------------
   // Create event ID
-  int _ev_create_id(String date, String location) {
+  int _create_id(String date, String location) {
     // Concatenate date & location for a unique hash
     String hash = '$date$location';
     // Return hashcode of string (thanks dart for builtin hash)
@@ -19,32 +25,12 @@ class Event {
   }
 
   // Change event date/location
-  void ev_update_fields(String? date, String? location){
-    // If date, change this.date to date
-    // if location, tomato tomāto
-    if (date != null){ this.date = date; }
-    if (location != null){ this.location = location; }
+  void updateEvent(String date, String location){
+    this.date = date;
+    this.location = location;
     // Recalculate ID
-    this.id = _ev_create_id(this.date, this.location);
-    // Later we'll have to validate the ID
-    // (Make sure ID doesn't already exist)
-
+    this.id = _create_id(this.date, this.location);
   }
-    
-  // Create event
-  // - Should return an event instance 
-  Event ev_create_event(String date, String location){
-    Event ev = Event(_ev_create_id(date, location), date, location);
-    // Store ev in database
-
-    return ev;
-  }
-
-  // 
 }
 
-// - Should be a database of events that can be accessed by all sessions
-class Event_Database {
-    // Load events from an actual database
-}
 
