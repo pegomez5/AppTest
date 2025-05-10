@@ -6,11 +6,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -20,9 +22,12 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.test.ui.theme.TestTheme
 import kotlin.random.Random
 import java.util.Scanner
@@ -66,7 +71,9 @@ fun UserForm(modifier: Modifier = Modifier) {
     var email by remember { mutableStateOf("") }
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    val userCreated by remember { mutableStateOf<User?>(null) }
+    var isCoordinator by remember { mutableStateOf(false) }
+
+    var newUser by remember { mutableStateOf<User?>(null) }
 
     val users = remember { mutableStateListOf<User>() }
 
@@ -77,29 +84,56 @@ fun UserForm(modifier: Modifier = Modifier) {
         TextField(value = username, onValueChange = { username = it }, label = { Text("Username") })
         TextField(value = password, onValueChange = { password = it }, label = { Text("Password") })
         Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = {
-            val newUser = User(
-                firstName, lastName, email, username, password,
-                isCoordinator = false,
-                userID = Random.nextInt(0, 100),
-                isActive = true,
-                clubs = listOf("ClubA"),
-                preferences = listOf("Pref1"),
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(top = 8.dp)
+        ) {
+            Checkbox(
+                checked = isCoordinator,
+                onCheckedChange = { isCoordinator = it }
             )
-            users.add(newUser)
-        }) {
+            Text("Are you a coordinator?")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        val isFormValid = firstName.isNotBlank() &&
+                lastName.isNotBlank() &&
+                email.contains("@") &&
+                (email.contains(".edu") ||
+                        email.contains(".org") ||
+                        email.contains(".com") ||
+                        email.contains(".net")) &&
+                username.isNotBlank() &&
+                password.isNotBlank()
+        Button (
+            onClick = {
+                newUser = User(
+                    firstName, lastName, email, username, password,
+                    isCoordinator = isCoordinator,
+                    userID = Random.nextInt(0, 1000000),
+                    isActive = true,
+                    clubs = listOf("ClubA"),
+                    preferences = listOf("Pref1"),
+                )
+                users.add(newUser!!)
+            },
+            enabled = isFormValid
+        )
+
+        {
             Text("Submit")
         }
+        if (!isFormValid) {
+            Text("Please fill out all required fields and use a valid email/password", color = Color.Red, fontSize = 12.sp)
+        }
         Spacer(modifier = Modifier.height(16.dp))
-        userCreated?.let { it ->
+        newUser?.let { it ->
             Text("Created user: ${it.firstName} ${it.lastName}" +
                     "\nEmail: ${it.email}" +
                     "\nUsername: ${it.username}" +
-                    "\nUserID: ${it.userID}" +
-                    "\nTotal users: ${users.size}" +
-                    users.forEach {
-                        Text("User: ${it.firstName} ${it.lastName}, Email: ${it.email}")
-                    })
+                    "\nUserID: ${it.userID}")
 
         }
     }
@@ -119,144 +153,4 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-
-
-
-/*class Calendar (
-    calendars: CharArray,
-    events: CharArray,
-    private val calenderId: Int,
-    title: String,
-    event: String,
-    modifier: Modifier
-): ComponentActivity() {
-    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent() {
-            TestTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    CalanderTest(
-                        userID = 0,
-                        isActive = true,
-                        //clubs = charArrayOf(),
-                        //preferences = charArrayOf(),
-                        firstName = "Hannah",
-                        lastName = "Jeffers",
-                        email = "hajeffers@ursinus.edu",
-                        username = "hajeffers",
-                        password = "password",
-                        isCoordinator = false,
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-            }
-        }
-    }
-}
-
-    Calendar(this.title, [this.event]) {
-        calendarId = Random().nextDouble();
-    }
-
-    void addCalendar(String calendar) {
-        final hasCalendar = calendars.map((e) => e.toLowerCase()).toList();
-
-        if (calendar.trim().isEmpty) {
-            print("Calendar name cannot be empty.");
-        } else if (hasCalendar.contains(calendar.toLowerCase())) {
-            print("Calendar already exists.");
-        } else {
-            calendars.add(calendar.trim());
-        }
-    }
-
-    void deleteCalendar(String target) {
-        final trimmedTarget = target.trim();
-        calendars.removeWhere((c) => c == trimmedTarget);
-    }
-
-    void addEvent(String event) {
-        final hasEvent = events.map((e) => e.toLowerCase()).toList();
-
-        if (hasEvent.contains(event.toLowerCase())) {
-            print("Event is already on the calendar.");
-        } else {
-            events.add(event);
-        }
-    }
-
-    static Calendar uploadCalendar(Map<String, dynamic> calendarData) {
-        final title = calendarData['title'] ?? 'Untitled';
-        final calendar = Calendar(title);
-
-        final eventList = calendarData['events'] as List<dynamic>?;
-
-        if (eventList != null) {
-            for (var ev in eventList) {
-                // Assuming events are simple strings for now
-                calendar.addEvent(ev.toString());
-            }
-        }
-
-        return calendar;
-    }
-
-    static Calendar? combineCalendars(Calendar c1, Calendar c2, String newTitle) {
-        if (c1.calendarId == c2.calendarId) {
-            return null;
-        }
-
-        final combined = Calendar(newTitle);
-        combined.event = null; // Optional, depending on how events are structured
-
-        // Append combined events to the global list (since that's your design)
-        events.addAll([...eventsOf(c1), ...eventsOf(c2)]);
-
-        return combined;
-    }
-
-    // Helper method for clarity
-    static List<String> eventsOf(Calendar c) {
-        // Here we assume global static events apply to all calendars (from your Python version)
-        return events;
-    }
-
-
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    TestTheme {
-        Greeting("Hannah")
-    }
-}*/
-
-@Composable
-fun UserTest(firstName: String, lastName: String, email: String, username: String, password: String, isCoordinator: Boolean, isActive: Boolean, userID: Int, modifier: Modifier) {
-    Text(
-        text = "First Name: $firstName\nLast Name: $lastName\nUsername: $username\nEmail: $email\nIs Active: $isActive\nIs Coordinator: $isCoordinator\n",
-        modifier = modifier
-    )
-
-}
-
-@Preview(showBackground = true)
-@Composable
-fun UserPreview() {
-    TestTheme {
-        UserTest(
-            "Hannah", "Jeffers", "hajeffers@ursinus.edu", "hajeffers", "password", false, true, 0, Modifier
-        )
-    }
-}
 
