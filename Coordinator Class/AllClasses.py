@@ -93,7 +93,6 @@ class Coordinator(User):
 
     def __init__(self, first_name, last_name, username, email, password, isCoordinator):
         super().__init__(first_name, last_name, username, email, password, isCoordinator)
-        print(self._user_id)
         self.coordinatedClubs = []
         self.managedEvents = []
         self.isCoordinator = True
